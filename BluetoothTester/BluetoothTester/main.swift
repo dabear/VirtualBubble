@@ -28,8 +28,13 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
 
     private lazy var service: CBMutableService = CBMutableService(type: primaryService, primary: true)
 
+    //this timer makes sure we send bubbleInfo every 300 seconds to wake up the central
     private var timer : RepeatingTimer?
+
+    //this is just a reasonable default.
+    //It will be updated later with the value from the central
     private var mtu : Int = 25
+
     var peripheralManager : CBPeripheralManager!
 
 
@@ -126,14 +131,17 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
     }
 
 
-    func periodicSendData(timeInterval: TimeInterval = 30) {
+    func periodicSendData(timeInterval: TimeInterval = 300) {
         NSLog("Setting periodic data transfer to : \(timeInterval) seconds")
         self.timer = RepeatingTimer(timeInterval: timeInterval)
         self.timer?.eventHandler = {
-            NSLog("periodicSendSensorData Timer Fired")
-            self.sendBubbleInfo()
-            self.sendSerialNumber()
-            self.sendSensorData()
+            self.managerQueue.sync {
+                NSLog("periodicSendSensorData Timer Fired")
+                self.sendBubbleInfo()
+                //self.sendSerialNumber()
+                //self.sendSensorData()
+            }
+
         }
         self.timer?.resume()
     }
@@ -231,6 +239,7 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
     }
 
 
+    private var periodicEnabled = false
 
 
 }
@@ -275,6 +284,7 @@ extension BluetoothEmulator {
      **/
 
 
+
     // Called when receiving writing from Central.
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
         print("\ndidReceiveWrite requests")
@@ -307,7 +317,12 @@ extension BluetoothEmulator {
                     NSLog("simulator: got bubbleinfo ack with appid \(appId)")
                     sendSerialNumber()
                     sendSensorData()
-                    //periodicSendData()
+
+                    if !periodicEnabled {
+                        periodicEnabled = true
+                        periodicSendData()
+                    }
+
                 }
             }
 
@@ -324,7 +339,7 @@ extension BluetoothEmulator {
     func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didUnsubscribeFrom characteristic: CBCharacteristic) {
 
         timer = nil
-
+        periodicEnabled = false
         print("\ndidUnsubscribeFrom characteristic")
 
 
