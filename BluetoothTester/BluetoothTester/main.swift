@@ -109,7 +109,7 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
 
         managerQueue.sync {
             peripheralManager = CBPeripheralManager(delegate: self, queue: managerQueue)
-            peripheralManager.delegate = self
+            //peripheralManager.delegate = self
             print(peripheralManager.stateDesc)
         }
 
