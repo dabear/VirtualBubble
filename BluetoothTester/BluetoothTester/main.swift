@@ -11,10 +11,7 @@ import CoreBluetooth
 import IOBluetooth
 import Cocoa
 
-
 print("Hello, World!")
-
-
 
 class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDelegate {
     fileprivate let serviceUUIDs: [CBUUID] = [CBUUID(string: "6E400001-B5A3-F393-E0A9-E50E24DCCA9E")]
@@ -22,21 +19,19 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
     fileprivate let writeCharachteristicUUID = CBUUID(string: "6E400002-B5A3-F393-E0A9-E50E24DCCA9E")
     fileprivate let notifyCharacteristicUUID = CBUUID(string: "6E400003-B5A3-F393-E0A9-E50E24DCCA9E")
 
-
-    fileprivate var writeCharacteristics  : CBMutableCharacteristic!
-    fileprivate var notifyCharacteristics : CBMutableCharacteristic!
+    fileprivate var writeCharacteristics: CBMutableCharacteristic!
+    fileprivate var notifyCharacteristics: CBMutableCharacteristic!
 
     private lazy var service: CBMutableService = CBMutableService(type: primaryService, primary: true)
 
     //this timer makes sure we send bubbleInfo every 300 seconds to wake up the central
-    private var timer : RepeatingTimer?
+    private var timer: RepeatingTimer?
 
     //this is just a reasonable default.
     //It will be updated later with the value from the central
-    private var mtu : Int = 25
+    private var mtu: Int = 25
 
-    var peripheralManager : CBPeripheralManager!
-
+    var peripheralManager: CBPeripheralManager!
 
     private let managerQueue = DispatchQueue(label: "no.bjorninge.bluetoothManagerQueue", qos: .utility)
 
@@ -51,16 +46,12 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
         }
     }
 
-
-
     func stopAdvertising() {
         print("stopping advertising")
         peripheralManager.stopAdvertising()
     }
 
     func startAdvertising() {
-
-
 
         if let deviceName = Host.current().localizedName {
            NSLog("Starting advertising on computer \(deviceName)")
@@ -70,21 +61,15 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
             fatalError("computer name must be changed to 'Bubble_fake' before running this program. Then restart bluetooth or computer to make it work!")
         }
 
-
         NSLog("Starting advertising with local name \(localName)")
 
-        let advertisementData: [String : Any] = [
+        let advertisementData: [String: Any] = [
             CBAdvertisementDataLocalNameKey: localName,
-            CBAdvertisementDataServiceUUIDsKey: [service.uuid],
+            CBAdvertisementDataServiceUUIDsKey: [service.uuid]
 
             //CBAdvertisementDataSolicitedServiceUUIDsKey: [service.uuid]
 
         ]
-
-
-
-
-
 
         //peripheralManager.publishL2CAPChannel(withEncryption: false)
         peripheralManager.removeAllServices()
@@ -98,28 +83,21 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
 
     override init() {
 
-
         super.init()
 
         let permissions: CBAttributePermissions = [.readable, .writeable]
         self.writeCharacteristics = CBMutableCharacteristic(type: writeCharachteristicUUID, properties: [.writeWithoutResponse, .write], value: nil, permissions: permissions)
         self.notifyCharacteristics = CBMutableCharacteristic(type: notifyCharacteristicUUID, properties: [.writeWithoutResponse, .write, .notify], value: nil, permissions: permissions)
 
-        service.characteristics = [writeCharacteristics,notifyCharacteristics]
+        service.characteristics = [writeCharacteristics, notifyCharacteristics]
 
         NSLog("initing BluetoothEmulator")
-
-
-
 
         managerQueue.sync {
             peripheralManager = CBPeripheralManager(delegate: self, queue: managerQueue)
             //peripheralManager.delegate = self
             print(peripheralManager.stateDesc)
         }
-
-
-
 
     }
     deinit {
@@ -129,7 +107,6 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
         NSLog("deiniting BluetoothEmulator")
 
     }
-
 
     func periodicSendData(timeInterval: TimeInterval = 300) {
         NSLog("Setting periodic data transfer to : \(timeInterval) seconds")
@@ -146,7 +123,6 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
         self.timer?.resume()
     }
 
-
     func sendSerialNumber() {
         let serial = BubbleTx.formatSerialNumber()
         //peripheralManager.updateValue(serial, for: notifyCharacteristics, onSubscribedCentrals: nil)
@@ -154,18 +130,15 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
 
     }
 
-
     func sendSensorData(sensorData: SensorData = LibreOOPDefaults.TestPatchDataAlwaysReturning63 ) {
 
         NSLog("sendSensorData")
         let sequence = sensorData.bytes
 
-
-
         var batches = [Data]()
 
         //sensorData = SensorData(uuid: Data(rxBuffer.subdata(in: 5..<13)), bytes: [UInt8](rxBuffer.subdata(in: 18..<362)), date: Date())
-        var advanceBy = mtu - BubbleTx.dataPacketPrefixLength
+        let advanceBy = mtu - BubbleTx.dataPacketPrefixLength
 
         for idx in stride(from: sequence.indices.lowerBound, to: sequence.indices.upperBound, by: advanceBy) {
             let subsequence = sequence[idx..<min(idx.advanced(by: advanceBy), sequence.count)]
@@ -173,28 +146,22 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
 
             batches.append(data)
 
-
         }
         updateNotifyCharacteristicsInBatch(batches: batches)
         NSLog("completed sendSensorData")
         //self.notifyCharacteristics.value = data
 
-
     }
 
     func sendBubbleInfo() {
-        var info = BubbleTx.formatBubbleInfo()
-        peripheralManager.updateValue(info, for: notifyCharacteristics, onSubscribedCentrals: nil)
-
+        let info = BubbleTx.formatBubbleInfo()
+        _ = updateNotifyCharacteristics(info)
 
     }
 
-
-
-
-
-
-
+    func updateNotifyCharacteristics(_ data: Data) -> Bool {
+        peripheralManager.updateValue(data, for: notifyCharacteristics, onSubscribedCentrals: nil)
+    }
 
     /*
      
@@ -202,32 +169,26 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
 
      **/
 
-    var sendingDataInfos = [Data]()
-    let lockQueue = DispatchQueue(label: "com.test.LockQueue")
-
-
+    private var sendDataQueue = [Data]()
+    private let lockQueue = DispatchQueue(label: "com.test.LockQueue")
     func updateNotifyCharacteristicsInBatch(batches: [Data]) {
            // Change to your data
           for data in batches {
-              lockQueue.sync() {
-                  sendingDataInfos.append(data)
+              lockQueue.sync {
+                  sendDataQueue.append(data)
               }
           }
-          processCharacteristicsUpdateQueue()
+          processNotifyCharacteristicsUpdate()
     }
 
-    func updateCharacteristic(_ data: Data) -> Bool {
-        peripheralManager.updateValue(data, for: notifyCharacteristics, onSubscribedCentrals: nil)
-    }
-
-    func processCharacteristicsUpdateQueue() {
-          guard let characteristicData = sendingDataInfos.first else {
+    func processNotifyCharacteristicsUpdate() {
+          guard let characteristicData = sendDataQueue.first else {
               return
           }
-          while updateCharacteristic(characteristicData) {
-              lockQueue.sync() {
-                  _ = sendingDataInfos.remove(at: 0)
-                  if sendingDataInfos.first == nil {
+          while updateNotifyCharacteristics(characteristicData) {
+              lockQueue.sync {
+                  _ = sendDataQueue.remove(at: 0)
+                  if sendDataQueue.first == nil {
                       return
                   }
               }
@@ -235,27 +196,19 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
       }
 
     func peripheralManagerIsReady(toUpdateSubscribers peripheral: CBPeripheralManager) {
-          processCharacteristicsUpdateQueue()
+          processNotifyCharacteristicsUpdate()
     }
-
-
-    private var periodicEnabled = false
 
 
 }
 
-
 extension BluetoothEmulator {
-
 
     func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: Error?) {
         print("peripheralManagerDidStartAdvertising")
         //stopAdvertising()
 
     }
-
-
-
 
     // Listen to dynamic values
     // Called when CBPeripheral .setNotifyValue(true, for: characteristic) is called from the central
@@ -269,11 +222,9 @@ extension BluetoothEmulator {
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveRead request: CBATTRequest) {
         print("\ndidReceiveRead request")
 
-
         peripheralManager.respond(to: request, withResult: .success)
 
     }
-
 
     /*
      dabear:: bubble responsestate is of type bubbleinfo
@@ -283,8 +234,6 @@ extension BluetoothEmulator {
 
      **/
 
-
-
     // Called when receiving writing from Central.
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
         print("\ndidReceiveWrite requests")
@@ -292,9 +241,8 @@ extension BluetoothEmulator {
             print("no request")
             return
         }
-        
-        requests.forEach{ req in
 
+        requests.forEach { req in
 
             NSLog("characteristic write request received for \(req.characteristic.uuid.uuidString)")
             NSLog("request value = \(req.value.debugDescription)")
@@ -310,7 +258,6 @@ extension BluetoothEmulator {
                     self.notifyCharacteristics.value = nil
                     sendBubbleInfo()
 
-
                 } else if value.count == 6 && first == 0x02 {
                     //bubbleinfo ack with appid as value[5]
                     let appId = value[5]
@@ -318,15 +265,12 @@ extension BluetoothEmulator {
                     sendSerialNumber()
                     sendSensorData()
 
-                    if !periodicEnabled {
-                        periodicEnabled = true
+                    if self.timer == nil {
                         periodicSendData()
                     }
 
                 }
             }
-
-
 
         }
 
@@ -334,14 +278,10 @@ extension BluetoothEmulator {
 
     }
 
-
-
     func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didUnsubscribeFrom characteristic: CBCharacteristic) {
 
         timer = nil
-        periodicEnabled = false
         print("\ndidUnsubscribeFrom characteristic")
-
 
     }
 
@@ -382,13 +322,6 @@ func runLoop() {
     print("OK, quitting")
 }
 
-
-
-
-
-
-
 BluetoothEmulator()
 
 runLoop()
-

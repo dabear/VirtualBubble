@@ -65,7 +65,7 @@ enum LibreOOPDefaults {
     public static var TestPatchAlwaysReturning63: [UInt8] {
         _testPatchAlwaysReturning63.map { $0 }
     }
-    public static var TestPatchDataAlwaysReturning63: SensorData{
+    public static var TestPatchDataAlwaysReturning63: SensorData {
         SensorData(uuid: "0123".data(using: .ascii)!, bytes: TestPatchAlwaysReturning63 )!
     }
 
