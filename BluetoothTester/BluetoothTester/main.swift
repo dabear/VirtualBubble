@@ -14,8 +14,7 @@ import Cocoa
 print("Hello, World!")
 
 class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDelegate {
-    fileprivate let serviceUUIDs: [CBUUID] = [CBUUID(string: "6E400001-B5A3-F393-E0A9-E50E24DCCA9E")]
-    fileprivate lazy var primaryService = serviceUUIDs.first!
+    fileprivate let primaryService = CBUUID(string: "6E400001-B5A3-F393-E0A9-E50E24DCCA9E")
     fileprivate let writeCharachteristicUUID = CBUUID(string: "6E400002-B5A3-F393-E0A9-E50E24DCCA9E")
     fileprivate let notifyCharacteristicUUID = CBUUID(string: "6E400003-B5A3-F393-E0A9-E50E24DCCA9E")
 
@@ -30,24 +29,23 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
     //this is just a reasonable default.
     //It will be updated later with the value from the central
     private var mtu: Int = 25
-
-    var peripheralManager: CBPeripheralManager!
+    private var peripheralManager: CBPeripheralManager!
 
     private let managerQueue = DispatchQueue(label: "no.bjorninge.bluetoothManagerQueue", qos: .utility)
 
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
-        print("state: \(peripheral.stateDesc)")
+        NSLog("State updated to: \(peripheral.stateDesc)")
 
         if peripheral.state == .poweredOn {
             startAdvertising()
         } else {
             stopAdvertising()
-            print("bluetooth not on, aborting")
+            NSLog("Bluetooth not on, aborting")
         }
     }
 
     func stopAdvertising() {
-        print("stopping advertising")
+        NSLog("Stopping advertising")
         peripheralManager.stopAdvertising()
     }
 
@@ -78,7 +76,7 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
     }
 
     func peripheralManager(_ peripheral: CBPeripheralManager, didAdd service: CBService, error: Error?) {
-        print("added service: \(service.description), error? \(error)")
+        NSLog("Added service: \(service.description), error? \(String(describing: error))")
     }
 
     override init() {
@@ -91,12 +89,12 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
 
         service.characteristics = [writeCharacteristics, notifyCharacteristics]
 
-        NSLog("initing BluetoothEmulator")
+        NSLog("Initing BluetoothEmulator")
 
         managerQueue.sync {
             peripheralManager = CBPeripheralManager(delegate: self, queue: managerQueue)
             //peripheralManager.delegate = self
-            print(peripheralManager.stateDesc)
+            NSLog(peripheralManager.stateDesc)
         }
 
     }
@@ -104,7 +102,7 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
         stopAdvertising()
         self.timer = nil
         peripheralManager = nil
-        NSLog("deiniting BluetoothEmulator")
+        NSLog("Deiniting BluetoothEmulator")
 
     }
 
@@ -205,7 +203,7 @@ class BluetoothEmulator: NSObject, CBPeripheralDelegate, CBPeripheralManagerDele
 extension BluetoothEmulator {
 
     func peripheralManagerDidStartAdvertising(_ peripheral: CBPeripheralManager, error: Error?) {
-        print("peripheralManagerDidStartAdvertising")
+        NSLog("peripheralManagerDidStartAdvertising")
         //stopAdvertising()
 
     }
@@ -213,14 +211,14 @@ extension BluetoothEmulator {
     // Listen to dynamic values
     // Called when CBPeripheral .setNotifyValue(true, for: characteristic) is called from the central
     func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didSubscribeTo characteristic: CBCharacteristic) {
-        print("\ndidSubscribeTo characteristic")
+        NSLog("\ndidSubscribeTo characteristic")
         mtu = central.maximumUpdateValueLength
 
     }
     // Read static values
     // Called when CBPeripheral .readValue(for: characteristic) is called from the central
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveRead request: CBATTRequest) {
-        print("\ndidReceiveRead request")
+        NSLog("\ndidReceiveRead request")
 
         peripheralManager.respond(to: request, withResult: .success)
 
@@ -236,9 +234,9 @@ extension BluetoothEmulator {
 
     // Called when receiving writing from Central.
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
-        print("\ndidReceiveWrite requests")
+        NSLog("\ndidReceiveWrite requests")
         guard let first = requests.first else {
-            print("no request")
+            NSLog("no request")
             return
         }
 
@@ -281,7 +279,7 @@ extension BluetoothEmulator {
     func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didUnsubscribeFrom characteristic: CBCharacteristic) {
 
         timer = nil
-        print("\ndidUnsubscribeFrom characteristic")
+        NSLog("\ndidUnsubscribeFrom characteristic")
 
     }
 
@@ -319,7 +317,7 @@ func runLoop() {
         runLoop.run(mode: .default, before: .distantFuture) {
 
     }
-    print("OK, quitting")
+    NSLog("OK, quitting!")
 }
 
 BluetoothEmulator()
