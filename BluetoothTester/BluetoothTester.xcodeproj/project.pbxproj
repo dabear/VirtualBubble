@@ -20,6 +20,7 @@
 		274E7493242412AB009DB6B3 /* DoubleExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274E7492242412AB009DB6B3 /* DoubleExtensions.swift */; };
 		274E7496242679B9009DB6B3 /* Bubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274E7495242679B9009DB6B3 /* Bubble.swift */; };
 		274E749924267BBB009DB6B3 /* RepeatingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 274E749824267BBB009DB6B3 /* RepeatingTimer.swift */; };
+		278D6F3E2429537D00AB6B7D /* BluetoothEmulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 278D6F3D2429537D00AB6B7D /* BluetoothEmulator.swift */; };
 		27EE4F8923AAB82D000E52CD /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27EE4F8823AAB82D000E52CD /* main.swift */; };
 		27EE4F9323AACF78000E52CD /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 27EE4F9123AACF71000E52CD /* CoreBluetooth.framework */; };
 		27EE4F9423AACF78000E52CD /* CoreBluetooth.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 27EE4F9123AACF71000E52CD /* CoreBluetooth.framework */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -62,6 +63,7 @@
 		274E7492242412AB009DB6B3 /* DoubleExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoubleExtensions.swift; sourceTree = "<group>"; };
 		274E7495242679B9009DB6B3 /* Bubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bubble.swift; sourceTree = "<group>"; };
 		274E749824267BBB009DB6B3 /* RepeatingTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
+		278D6F3D2429537D00AB6B7D /* BluetoothEmulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothEmulator.swift; sourceTree = "<group>"; };
 		27EE4F8523AAB82D000E52CD /* BluetoothTester */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BluetoothTester; sourceTree = BUILT_PRODUCTS_DIR; };
 		27EE4F8823AAB82D000E52CD /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		27EE4F8F23AACF52000E52CD /* BluetoothTester.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = BluetoothTester.plist; sourceTree = "<group>"; };
@@ -165,6 +167,7 @@
 				274E7471242410CB009DB6B3 /* TestData */,
 				27EE4F9623AAEA0C000E52CD /* BluetoothTester.entitlements */,
 				27EE4F8823AAB82D000E52CD /* main.swift */,
+				278D6F3D2429537D00AB6B7D /* BluetoothEmulator.swift */,
 			);
 			path = BluetoothTester;
 			sourceTree = "<group>";
@@ -236,6 +239,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				278D6F3E2429537D00AB6B7D /* BluetoothEmulator.swift in Sources */,
 				274E747924241114009DB6B3 /* LibreOOPDefaults.swift in Sources */,
 				274E749124241283009DB6B3 /* DateExtensions.swift in Sources */,
 				273A417124269BE900C33EBA /* Retransmit.swift in Sources */,
