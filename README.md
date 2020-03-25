@@ -18,3 +18,8 @@ Then run the app in xcode on "My Mac"
 
 # Interacting with the bluetooth service
 Open any compatible bluetooth app on an iphone (Loop+miaomiaoclient) or android(xdrip+) and connect. 
+
+# Demo
+https://www.youtube.com/watch?v=cm1tDrAtU5I&feature=youtu.be
+
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/cm1tDrAtU5I/0.jpg)](http://www.youtube.com/watch?v=cm1tDrAtU5I "Virtual Bubble in action")
