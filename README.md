@@ -7,9 +7,9 @@ When started, it fakes a bubble cgm reader bluetooth profile, and responds to an
 Every five minutes, every central connected will be woken up. A connected central is then expected to ask for sensordata 
 
 # Prerequisite
-Your Mac's local hostname *must* renamed to "Bubble_fake1" before you continue. To do so:
+Your Mac's local hostname *must* renamed to "Bubble" before you continue. To do so:
 On your Mac, choose Apple menu > System Preferences, then click Sharing. Open Sharing preferences.
-Type a new name in the Computer Name field. "Bubble_fake1" is what you should enter. You may need to click the lock icon and provide an administrator name and password before you can change the name.
+Type a new name in the Computer Name field. "Bubble" is what you should enter. You may need to click the lock icon and provide an administrator name and password before you can change the name.
 You may have to toggle bluetooth on and off or reboot your computer for this to work reliably
 
 # Installation and running the app
@@ -17,4 +17,4 @@ Only source code is provided. You should open the source code in xcode and go to
 Then run the app in xcode on "My Mac"
 
 # Interacting with the bluetooth service
-Open any compatible bluetooth app on an iphone or android and connect.
+Open any compatible bluetooth app on an iphone (Loop+miaomiaoclient) or android(xdrip+) and connect. 

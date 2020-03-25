@@ -241,7 +241,7 @@ extension BluetoothEmulator {
 
             NSLog("characteristic write request received for \(req.characteristic.uuid.uuidString)")
             NSLog("request value = \(req.value.debugDescription)")
-            NSLog("request value decocced: \(req.value?.toDebugString())")
+            NSLog("request value decoded: \(req.value?.toDebugString())")
 
             //self.notifyCharacteristics.value = req.value
             if let value = req.value, let first = value.first {
